@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "559640153846",
+    "project_id": "flutter-eng-177bf",
+    "storage_bucket": "flutter-eng-177bf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559640153846:android:06e2fedc7427183aec66d7",
+        "android_client_info": {
+          "package_name": "com.example.flashcard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7_Aep02sthUuYbNMbKiDQu4GcuKNJn30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
