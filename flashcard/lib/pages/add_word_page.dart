@@ -28,94 +28,91 @@ class _AddWordPageState extends State<AddWordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Word'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: _englishWords.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(_englishWords[index]),
-                    subtitle: Text(_vietnameseWords[index]),
-                  );
+        appBar: AppBar(
+          title: Text('Add Word'),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  if (kIsWeb) {
+                    _pickAndAddWordsFromCSVWeb();
+                  } else {
+                    _pickAndAddWordsFromCSV();
+                  }
                 },
-              ),
-            ),
-            TextFormField(
-              controller: _englishController,
-              decoration: InputDecoration(labelText: 'English'),
-            ),
-            TextFormField(
-              controller: _vietnameseController,
-              decoration: InputDecoration(labelText: 'Vietnamese'),
-            ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _addWordToList,
-              child: Text('Add Word'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (kIsWeb) {
-                  _pickAndAddWordsFromCSVWeb();
-                } else {
-                  _pickAndAddWordsFromCSV();
-                }
-              },
-              child: Text('Import from CSV'),
-            ),
-            ElevatedButton(
+                icon: Icon(Icons.document_scanner)),
+            IconButton(
+              icon: Icon(Icons.check),
               onPressed: _addWordsToTopic,
-              child: Text('Add Words to Topic'),
             ),
           ],
         ),
-      ),
-    );
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _englishWords.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      child: ListTile(
+                        title: TextFormField(
+                          decoration: InputDecoration(labelText: 'Tiếng Anh'),
+                          initialValue: _englishWords[index],
+                          onChanged: (value) {
+                            setState(() {
+                              _englishWords[index] = value;
+                            });
+                          },
+                        ),
+                        subtitle: TextFormField(
+                          decoration: InputDecoration(labelText: 'Tiếng Việt'),
+                          initialValue: _vietnameseWords[index],
+                          onChanged: (value) {
+                            setState(() {
+                              _vietnameseWords[index] = value;
+                            });
+                          },
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () {
+                            setState(() {
+                              _englishWords.removeAt(index);
+                              _vietnameseWords.removeAt(index);
+                            });
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _addWordToList,
+          child: Icon(Icons.add),
+        ));
   }
 
   void _addWordToList() {
-    String englishWord = _englishController.text.trim();
-    String vietnameseWord = _vietnameseController.text.trim();
-
-    if (englishWord.isNotEmpty && vietnameseWord.isNotEmpty) {
-      setState(() {
-        _englishWords.add(englishWord);
-        _vietnameseWords.add(vietnameseWord);
-        _englishController.clear();
-        _vietnameseController.clear();
-      });
-    } else {
-      // Hiển thị thông báo lỗi nếu một trong hai trường rỗng
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill in both English and Vietnamese fields.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
+    String englishWord = '';
+    String vietnameseWord = '';
+    setState(() {
+      _englishWords.add(englishWord);
+      _vietnameseWords.add(vietnameseWord);
+    });
   }
 
   Future<void> _pickAndAddWordsFromCSV() async {
     try {
-      final mobile.FilePickerResult? result = await mobile.FilePicker.platform.pickFiles(
+      final mobile.FilePickerResult? result =
+          await mobile.FilePicker.platform.pickFiles(
         type: mobile.FileType.custom,
         allowedExtensions: ['csv'],
       );
@@ -173,7 +170,8 @@ class _AddWordPageState extends State<AddWordPage> {
     if (_englishWords.isNotEmpty && _vietnameseWords.isNotEmpty) {
       try {
         for (int i = 0; i < _englishWords.length; i++) {
-          await _wordService.addWord(_englishWords[i], _vietnameseWords[i], widget.topicId);
+          await _wordService.addWord(
+              _englishWords[i], _vietnameseWords[i], widget.topicId);
         }
         Navigator.pop(context); // Trở về màn hình trước sau khi thêm từ
       } catch (error) {
@@ -208,6 +206,3 @@ class _AddWordPageState extends State<AddWordPage> {
     super.dispose();
   }
 }
-
-
-

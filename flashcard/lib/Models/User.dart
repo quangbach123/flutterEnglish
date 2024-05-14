@@ -19,16 +19,17 @@ class User {
 
   // Factory constructor để tạo User từ một tài liệu Firestore
   factory User.fromFirestore(DocumentSnapshot doc) {
-    List<DocumentReference> folderRefs = List<DocumentReference>.from(doc['Folders']);
-    List<DocumentReference> topicRefs = List<DocumentReference>.from(doc['Topics']);
+    List<DocumentReference> folderRefs =
+        List<DocumentReference>.from(doc['Folders']);
+    List<DocumentReference> topicRefs =
+        List<DocumentReference>.from(doc['Topics']);
 
     return User(
-      id: doc.id,
-      email: doc['Email'],
-      name: doc['Name'],
-      avatarUrl: doc['AvatarUrl'], 
-      folderReferences: folderRefs,
-      topicReferences:topicRefs
-    );
+        id: doc.id,
+        email: doc['Email'],
+        name: doc['Name'],
+        avatarUrl: doc['AvatarUrl'],
+        folderReferences: folderRefs,
+        topicReferences: topicRefs);
   }
 }

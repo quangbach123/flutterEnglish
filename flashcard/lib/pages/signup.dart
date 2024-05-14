@@ -1,12 +1,11 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flashcard/Services/UserServices.dart';
-import 'package:flashcard/pages/Topic_home_page.dart';
+import 'package:flashcard/components/navigation.dart';
 import 'package:flashcard/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flashcard/Models/User.dart'as LocalUser;
+import 'package:flashcard/Models/User.dart' as LocalUser;
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -24,73 +23,77 @@ class _SignUpState extends State<SignUp> {
 
   final _formkey = GlobalKey<FormState>();
 
-registration(BuildContext context) async {
-  if (password != null &&
-      namecontroller.text != "" &&
-      mailcontroller.text != "") {
-    try {
-      // Capture the context
-      BuildContext capturedContext = context;
+  registration(BuildContext context) async {
+    if (password != null &&
+        namecontroller.text != "" &&
+        mailcontroller.text != "") {
+      try {
+        // Capture the context
+        BuildContext capturedContext = context;
 
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-      await FirebaseFirestore.instance.collection('User').doc(userCredential.user!.uid).set({
-        'Email': email,
-        'Name': namecontroller.text,
-        'Folders': [], // Mảng rỗng ban đầu
-        'Topics': [], // Mảng rỗng ban đầu
-        'AvatarUrl': '', // Chuỗi rỗng ban đầu
-      });
-      ScaffoldMessenger.of(capturedContext).showSnackBar(SnackBar(
-        content: Text(
-          "Registered Successfully",
-          style: TextStyle(fontSize: 20.0),
-        ),
-      ));
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('email', email);
-      prefs.setString('password', password);
-      UserService userService = UserService();
-      LocalUser.User? user = await userService.getUserByEmail(email);
-
-      // Check if user is not null before accessing its id property
-      if (user != null) {
-        Navigator.push(
-          capturedContext,
-          MaterialPageRoute(builder: (context) => HomePage(userId: user.id!)),
-        );
-      } else {
-        // Handle the case where user is null
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+        
+        await FirebaseFirestore.instance
+            .collection('User')
+            .doc(userCredential.user!.uid)
+            .set({
+          'Email': email,
+          'Name': namecontroller.text,
+          'Folders': [], // Mảng rỗng ban đầu
+          'Topics': [], // Mảng rỗng ban đầu
+          'AvatarUrl': userCredential.user?.photoURL, // Chuỗi rỗng ban đầu
+        });
         ScaffoldMessenger.of(capturedContext).showSnackBar(SnackBar(
-          backgroundColor: Colors.orangeAccent,
           content: Text(
-            "User information not found",
-            style: TextStyle(fontSize: 18.0),
+            "Registered Successfully",
+            style: TextStyle(fontSize: 20.0),
           ),
         ));
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.orangeAccent,
-          content: Text(
-            "Password Provided is too Weak",
-            style: TextStyle(fontSize: 18.0),
-          ),
-        ));
-      } else if (e.code == "email-already-in-use") {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.orangeAccent,
-          content: Text(
-            "Account Already exists",
-            style: TextStyle(fontSize: 18.0),
-          ),
-        ));
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('email', email);
+        prefs.setString('password', password);
+        UserService userService = UserService();
+        LocalUser.User? user = await userService.getUserByEmail(email);
+
+        // Check if user is not null before accessing its id property
+        if (user != null) {
+          Navigator.push(
+            capturedContext,
+            MaterialPageRoute(
+                builder: (context) => MyNavigation(userId: user.id!)),
+          );
+        } else {
+          // Handle the case where user is null
+          ScaffoldMessenger.of(capturedContext).showSnackBar(SnackBar(
+            backgroundColor: Colors.orangeAccent,
+            content: Text(
+              "User information not found",
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ));
+        }
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.orangeAccent,
+            content: Text(
+              "Password Provided is too Weak",
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ));
+        } else if (e.code == "email-already-in-use") {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.orangeAccent,
+            content: Text(
+              "Account Already exists",
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ));
+        }
       }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -178,22 +181,22 @@ registration(BuildContext context) async {
                         controller: passwordcontroller,
                         decoration: InputDecoration(
                             border: InputBorder.none,
-                            
                             hintText: "Password",
                             hintStyle: TextStyle(
                                 color: Color(0xFFb2b7bf), fontSize: 18.0)),
-             obscureText: true,  ),
+                        obscureText: true,
+                      ),
                     ),
                     SizedBox(
                       height: 30.0,
                     ),
                     GestureDetector(
-                      onTap: (){
-                        if(_formkey.currentState!.validate()){
+                      onTap: () {
+                        if (_formkey.currentState!.validate()) {
                           setState(() {
-                            email=mailcontroller.text;
-                            name= namecontroller.text;
-                            password=passwordcontroller.text;
+                            email = mailcontroller.text;
+                            name = namecontroller.text;
+                            password = passwordcontroller.text;
                           });
                         }
                         registration(this.context);

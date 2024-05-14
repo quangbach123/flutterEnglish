@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum FlipDirection {
+enum FlipDirections {
   horizontal,
   vertical,
 }
@@ -8,20 +8,23 @@ enum FlipDirection {
 class FlipCardAnimation extends StatefulWidget {
   final Widget frontWidget;
   final Widget backWidget;
-  final FlipDirection direction;
+  final FlipDirections direction;
 
   const FlipCardAnimation({
     Key? key,
     required this.frontWidget,
     required this.backWidget,
-    this.direction = FlipDirection.horizontal, required Null Function() onAnimationStart, required Null Function() onAnimationEnd,
+    this.direction = FlipDirections.horizontal,
+    required Null Function() onAnimationStart,
+    required Null Function() onAnimationEnd,
   }) : super(key: key);
 
   @override
   _FlipCardAnimationState createState() => _FlipCardAnimationState();
 }
 
-class _FlipCardAnimationState extends State<FlipCardAnimation> with SingleTickerProviderStateMixin {
+class _FlipCardAnimationState extends State<FlipCardAnimation>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -57,7 +60,8 @@ class _FlipCardAnimationState extends State<FlipCardAnimation> with SingleTicker
   }
 
   void _flipCard() {
-    if (_controller.status == AnimationStatus.completed || _controller.status == AnimationStatus.forward) {
+    if (_controller.status == AnimationStatus.completed ||
+        _controller.status == AnimationStatus.forward) {
       _controller.reverse();
     } else {
       _controller.forward();
@@ -78,8 +82,12 @@ class _FlipCardAnimationState extends State<FlipCardAnimation> with SingleTicker
             alignment: Alignment.center,
             transform: Matrix4.identity()
               ..setEntry(3, 2, 0.002)
-              ..rotateY(widget.direction == FlipDirection.horizontal ? frontRotation : 0)
-              ..rotateX(widget.direction == FlipDirection.vertical ? backRotation : 0),
+              ..rotateY(widget.direction == FlipDirections.horizontal
+                  ? frontRotation
+                  : 0)
+              ..rotateX(widget.direction == FlipDirections.vertical
+                  ? backRotation
+                  : 0),
             child: _isFront ? widget.frontWidget : widget.backWidget,
           );
         },
@@ -87,5 +95,3 @@ class _FlipCardAnimationState extends State<FlipCardAnimation> with SingleTicker
     );
   }
 }
-
-

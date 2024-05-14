@@ -15,12 +15,14 @@ class Folder {
 
   // Factory constructor để tạo Folder từ một tài liệu Firestore
   factory Folder.fromFirestore(DocumentSnapshot doc) {
-    List<DocumentReference> topicRefs = List<DocumentReference>.from(doc['Topics']);
+    List<DocumentReference> topicRefs =
+        List<DocumentReference>.from(doc['Topics']);
     return Folder(
       documentId: doc.id,
       name: doc['Name'],
       Topics: topicRefs,
-      userId: doc['userId'], // Gán giá trị cho trường userId từ tài liệu Firestore
+      userId:
+          doc['userId'], // Gán giá trị cho trường userId từ tài liệu Firestore
     );
   }
 }

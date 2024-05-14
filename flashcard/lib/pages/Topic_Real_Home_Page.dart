@@ -17,12 +17,11 @@ class UserTopicScreen extends StatefulWidget {
 class _UserTopicScreenState extends State<UserTopicScreen> {
   final TopicService _topicService = TopicService();
   late List<Topic> _topics;
-  
 
   @override
   void initState() {
     super.initState();
-      _topics = [];   
+    _topics = [];
     _loadData();
   }
 
@@ -31,7 +30,6 @@ class _UserTopicScreenState extends State<UserTopicScreen> {
       List<Topic> topics = await _topicService.getTopicsByUserId(widget.userId);
       setState(() {
         _topics = topics;
-        
       });
     } catch (error) {
       print("Error loading topics: $error");
@@ -39,7 +37,7 @@ class _UserTopicScreenState extends State<UserTopicScreen> {
   }
 
   Future<void> _addTopic() async {
-    String topicName = '';
+    String topicName = 'Học phần chưa đặt tên';
     String topicImageUrl = '';
 
     return showDialog(
@@ -73,17 +71,19 @@ class _UserTopicScreenState extends State<UserTopicScreen> {
                 // Kiểm tra xem có user không trước khi thêm chủ đề mới
                 if (user != null) {
                   Topic newTopic = Topic(
-                    documentId: '', // Bạn có thể sử dụng UUID hoặc một phương thức tạo ID khác để tạo một ID ngẫu nhiên cho chủ đề mới
+                    documentId:
+                        '', // Bạn có thể sử dụng UUID hoặc một phương thức tạo ID khác để tạo một ID ngẫu nhiên cho chủ đề mới
                     topicImageUrl: topicImageUrl,
                     topicName: topicName,
                     userId: widget.userId,
                     userAvatarUrl: user.avatarUrl, // Lấy avatarUrl từ user
-                    userName: user.name, 
-                    isPublic: false, 
-                    view: '0', 
+                    userName: user.name,
+                    isPublic: false,
+                    view: '0',
                   );
                   // Thêm chủ đề mới với tham chiếu đến người dùng
-                  await _topicService.addTopicWithUserReference(newTopic, widget.userId);
+                  await _topicService.addTopicWithUserReference(
+                      newTopic, widget.userId);
                   await _loadData();
                   Navigator.of(context).pop();
                 } else {
@@ -98,6 +98,7 @@ class _UserTopicScreenState extends State<UserTopicScreen> {
       },
     );
   }
+
   Future<void> _deleteTopic(String topicId) async {
     try {
       await _topicService.deleteTopicWithUserReference(topicId, widget.userId);
@@ -128,52 +129,68 @@ class _UserTopicScreenState extends State<UserTopicScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('User Topics'),
-      ),
-      body:_topics.isEmpty
-        ? Center(child: Text('No topics found'))
-        : ListView.builder(
-        itemCount: _topics.length,
-        itemBuilder: (context, index) {
-          Topic topic = _topics[index];
-          return ListTile(
-            title: Text(topic.topicName),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(topic.isPublic ? Icons.public : Icons.lock),
-                  onPressed: () => _toggleTopicStatus(topic.documentId, topic.isPublic),
-                ),
-                IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => _buildEditTopicDialog(topic),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => _deleteTopic(topic.documentId),
-                ),
-                
-              ],
+      body: _topics.isEmpty
+          ? const Center(child: Text('No topics found'))
+          : ListView.builder(
+              itemCount: _topics.length,
+              itemBuilder: (context, index) {
+                Topic topic = _topics[index];
+                return Card.outlined(
+                  child: ListTile(
+                    title: ListTile(
+                      title: Text(
+                        topic.topicName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    subtitle: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(topic.userAvatarUrl ??
+                            'https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png'),
+                      ),
+                      title: Text(topic.userName ?? 'Unknown'),
+                      trailing: Text(topic.view),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon:
+                              Icon(topic.isPublic ? Icons.public : Icons.lock),
+                          onPressed: () => _toggleTopicStatus(
+                              topic.documentId, topic.isPublic),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  _buildEditTopicDialog(topic),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () => _deleteTopic(topic.documentId),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WordListPage(
+                            topicId: topic.documentId,
+                            userId: widget.userId,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => WordListPage(topicId: topic.documentId, userId: widget.userId,),
-                ),
-              );
-            },
-          );
-        },
-      ),
-      
       floatingActionButton: FloatingActionButton(
         onPressed: _addTopic,
         child: Icon(Icons.add),

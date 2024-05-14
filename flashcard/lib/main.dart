@@ -16,12 +16,11 @@
 // );
 //   await Permission.microphone.request(); // Yêu cầu quyền truy cập microphone
 //   runApp(MyApp());
-  
+
 // }
 
-
 // class MyApp extends StatelessWidget {
-  
+
 //   @override
 //   Widget build(BuildContext context) {
 //     return MaterialApp(
@@ -34,10 +33,11 @@
 //   }
 // }
 
+import 'package:flashcard/components/navigation.dart';
+import 'package:flashcard/utils/routes.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:flashcard/Configs/themes.dart';
 import 'package:flashcard/firebase_options.dart';
-import 'package:flashcard/pages/Topic_home_page.dart';
 
 import 'package:flashcard/pages/login.dart';
 import 'package:flutter/foundation.dart';
@@ -61,19 +61,22 @@ class MyApp extends StatelessWidget {
       title: 'Your App Title',
       theme: appTheme,
       debugShowCheckedModeBanner: false,
-      home: AuthenticationWrapper(),
+      initialRoute: RouteGenerator.authenticationWrapper,
+      onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }
 
 class AuthenticationWrapper extends StatelessWidget {
+  const AuthenticationWrapper({super.key});
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
       future: checkLoggedIn(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
+          return const Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
             ),
@@ -89,15 +92,15 @@ class AuthenticationWrapper extends StatelessWidget {
                 future: _fetchUserId(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Scaffold(
+                    return const Scaffold(
                       body: Center(
                         child: CircularProgressIndicator(),
                       ),
                     );
                   } else {
                     return snapshot.hasData
-                        ? HomePage(userId: snapshot.data!)
-                        : Scaffold(
+                        ? MyNavigation(userId: snapshot.data!)
+                        : const Scaffold(
                             body: Center(
                               child: CircularProgressIndicator(),
                             ),
@@ -106,9 +109,9 @@ class AuthenticationWrapper extends StatelessWidget {
                 },
               );
             }
-            return HomePage(userId: userId);
+            return MyNavigation(userId: userId);
           } else {
-            return LogIn(); // Chuyển hướng đến trang đăng nhập nếu chưa đăng nhập
+            return const LogIn(); // Chuyển hướng đến trang đăng nhập nếu chưa đăng nhập
           }
         }
       },
@@ -132,4 +135,3 @@ Future<bool> checkLoggedIn() async {
   }
   return savedId.isNotEmpty;
 }
-

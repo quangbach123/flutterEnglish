@@ -6,12 +6,12 @@ import 'package:flashcard/Models/Topic.dart';
 class PublicTopicsPage extends StatefulWidget {
   final String userId;
 
-  const PublicTopicsPage({Key? key, required this.userId}) : super(key: key); 
+  const PublicTopicsPage({Key? key, required this.userId}) : super(key: key);
   @override
   _PublicTopicsPageState createState() => _PublicTopicsPageState();
 }
 
-class _PublicTopicsPageState extends State{
+class _PublicTopicsPageState extends State {
   TextEditingController _searchController = TextEditingController();
   List<Topic> _publicTopics = [];
   List<Topic> _filteredTopics = [];
@@ -44,11 +44,12 @@ class _PublicTopicsPageState extends State{
     });
   }
 
-  void _navigateToWordListPage(Topic topic,String userId) {
+  void _navigateToWordListPage(Topic topic, String userId) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => WordListPage(topicId: topic.documentId,userId: userId),
+        builder: (context) =>
+            WordListPage(topicId: topic.documentId, userId: userId),
       ),
     );
   }
@@ -72,30 +73,65 @@ class _PublicTopicsPageState extends State{
               onChanged: _filterTopics,
             ),
           ),
-Expanded(
-  child: ListView.builder(
-    itemCount: _filteredTopics.length,
-    itemBuilder: (context, index) {
-      Topic topic = _filteredTopics[index];
-      final String? userAvatarUrl = topic.userAvatarUrl;
-      final String? userName = topic.userName; // Lấy userName từ topic
-
-      return ListTile(
-        leading: CircleAvatar(
-          backgroundImage: userAvatarUrl != null
-              ? NetworkImage(userAvatarUrl)
-              : NetworkImage(
-                  'https://png.pngtree.com/png-vector/20210921/ourlarge/pngtree-flat-people-profile-icon-png-png-image_3947764.png',
-                ),
-        ),
-        title: Text(topic.topicName),
-        subtitle: Text('ID: ${topic.documentId}'),
-        trailing: userName != null ? Text(userName) : Text('No username'), // Kiểm tra userName trước khi sử dụng
-        onTap: () => _navigateToWordListPage(topic, (widget as PublicTopicsPage).userId),
-      );
-    },
-  ),
-),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _filteredTopics.length,
+              itemBuilder: (context, index) {
+                Topic topic = _filteredTopics[index];
+                final String? userAvatarUrl = topic.userAvatarUrl;
+                final String? userName =
+                    topic.userName; // Lấy userName từ topic
+                return Card.outlined(
+                    child: ListTile(
+                  title: ListTile(
+                    title: Text(
+                      topic.topicName,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 24),
+                    ),
+                    subtitle: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage:
+                            topic != null && topic.userAvatarUrl != null
+                                ? NetworkImage(topic.userAvatarUrl!)
+                                : AssetImage('assets/images/default-avatar.jpg')
+                                    as ImageProvider<Object>,
+                      ),
+                      title: Text(topic.userName ?? 'Unknown'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.remove_red_eye_sharp),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            topic.view.toString(),
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    ),
+                    onTap: () => _navigateToWordListPage(
+                        topic, (widget as PublicTopicsPage).userId),
+                  ),
+                ));
+                // return ListTile(
+                //   leading: CircleAvatar(
+                //     backgroundImage: userAvatarUrl != null
+                //         ? NetworkImage(userAvatarUrl)
+                //         : NetworkImage(
+                //             'https://png.pngtree.com/png-vector/20210921/ourlarge/pngtree-flat-people-profile-icon-png-png-image_3947764.png',
+                //           ),
+                //   ),
+                //   title: Text(topic.topicName),
+                //   subtitle: Text('ID: ${topic.documentId}'),
+                //   trailing: userName != null ? Text(userName) : Text('No username'), // Kiểm tra userName trước khi sử dụng
+                //   onTap: () => _navigateToWordListPage(topic, (widget as PublicTopicsPage).userId),
+                // );
+              },
+            ),
+          ),
         ],
       ),
     );
