@@ -328,204 +328,190 @@ class _WordListPageState extends State<WordListPage> {
           ),
         ],
       ),
-      body: _topic == null
-          ? CircularProgressIndicator()
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 8),
-                      Column(
-                        children: [
-                          Container(
-                              height: 200,
-                              child: PageView.builder(
-                                  controller: controller,
-                                  itemCount: _words.length,
-                                  itemBuilder: (context, index) => FlipCard(
-                                        direction:
-                                            FlipDirection.VERTICAL, // default
+      body: Center(
+        child: _isLoading
+            ? const CircularProgressIndicator()
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
+                        Column(
+                          children: [
+                            Container(
+                                height: 200,
+                                child: PageView.builder(
+                                    controller: controller,
+                                    itemCount: _words.length,
+                                    itemBuilder: (context, index) => FlipCard(
+                                          direction:
+                                              FlipDirection.VERTICAL, // default
 
-                                        front: card(
-                                            english: _words[index].english,
-                                            size: 200,
-                                            color: Colors.black,
-                                            ttsButton: TtsButton(
-                                                language: 'en-US',
-                                                text: _words[index].english)),
-                                        back: card(
-                                            english: _words[index].vietnam,
-                                            size: 200,
-                                            color: Colors.black,
-                                            ttsButton: TtsButton(
-                                                language: 'vi-VN',
-                                                text: _words[index].vietnam)),
-                                        side: CardSide
-                                            .FRONT, // The side to initially display.
-                                      ))),
-                          const SizedBox(height: 16),
-                          SmoothPageIndicator(
-                            controller: controller,
-                            count: _words.length,
-                            onDotClicked: (index) {
-                              controller.animateToPage(index,
-                                  duration: const Duration(milliseconds: 500),
-                                  curve: Curves.easeIn);
-                            },
-                            effect: WormEffect(
-                                dotHeight: 8.0,
-                                dotWidth: 8.0,
-                                spacing: 4,
-                                activeDotColor: Colors.black,
-                                dotColor: Colors.grey[300]!),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('${_topic.topicName}',
-                              style: TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold)),
-                          Visibility(
-                            visible: !_isLoading,
-                            child: IconButton(
-                              icon: Icon(Icons.download_sharp),
-                              onPressed: () {
-                                // Truyền danh sách từ vào hàm
-                                exportToCSV(
-                                    this.context, _words, widget.topicId);
+                                          front: card(
+                                              english: _words[index].english,
+                                              size: 200,
+                                              color: Colors.black,
+                                              ttsButton: TtsButton(
+                                                  language: 'en-US',
+                                                  text: _words[index].english)),
+                                          back: card(
+                                              english: _words[index].vietnam,
+                                              size: 200,
+                                              color: Colors.black,
+                                              ttsButton: TtsButton(
+                                                  language: 'vi-VN',
+                                                  text: _words[index].vietnam)),
+                                          side: CardSide
+                                              .FRONT, // The side to initially display.
+                                        ))),
+                            const SizedBox(height: 16),
+                            SmoothPageIndicator(
+                              controller: controller,
+                              count: _words.length,
+                              onDotClicked: (index) {
+                                controller.animateToPage(index,
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.easeIn);
                               },
+                              effect: WormEffect(
+                                  dotHeight: 8.0,
+                                  dotWidth: 8.0,
+                                  spacing: 4,
+                                  activeDotColor: Colors.black,
+                                  dotColor: Colors.grey[300]!),
                             ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          CircleAvatar(
-                              radius: 20,
-                              backgroundImage: NetworkImage(_topic
-                                      .userAvatarUrl ??
-                                  'https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png')),
-                          const SizedBox(width: 8),
-                          Text(_topic.userName ?? 'Unknown'),
-                          const SizedBox(width: 8),
-                          VerticalDivider(
-                            color: Colors.black,
-                            thickness: 2,
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('${_topic.topicName}',
+                                style: TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold)),
+                            Visibility(
+                              visible: !_isLoading,
+                              child: IconButton(
+                                icon: Icon(Icons.download_sharp),
+                                onPressed: () {
+                                  // Truyền danh sách từ vào hàm
+                                  exportToCSV(
+                                      this.context, _words, widget.topicId);
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            CircleAvatar(
+                                radius: 20,
+                                backgroundImage: NetworkImage(_topic
+                                        .userAvatarUrl ??
+                                    'https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png')),
+                            const SizedBox(width: 8),
+                            Text(_topic.userName ?? 'Unknown'),
+                            const SizedBox(width: 8),
+                            VerticalDivider(
+                              color: Colors.black,
+                              thickness: 2,
+                            ),
+                            Text('${_words.length} thuật ngữ'),
+                          ],
+                        ),
+                        Visibility(
+                          visible: !_isLoading,
+                          child: Switch(
+                            value: _isEnglishFirst,
+                            onChanged: (newValue) {
+                              setState(() {
+                                _isEnglishFirst = newValue;
+                                print(
+                                    'hiển thị mặc định tiếng anh trước: $_isEnglishFirst');
+                              });
+                            },
                           ),
-                          Text('${_words.length} thuật ngữ'),
-                        ],
-                      ),
-                      Visibility(
-                        visible: !_isLoading,
-                        child: Switch(
-                          value: _isEnglishFirst,
-                          onChanged: (newValue) {
-                            setState(() {
-                              _isEnglishFirst = newValue;
-                              print(
-                                  'hiển thị mặc định tiếng anh trước: $_isEnglishFirst');
-                            });
-                          },
                         ),
-                      ),
-                      Visibility(
-                        visible: !_isLoading,
-                        child: FutureBuilder<List<DocumentSnapshot>>(
-                          future: _recordListFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return Text('No records found');
-                            } else {
-                              // Lấy percentageCorrect từ danh sách bản ghi
-                              double percentageCorrect = snapshot.data![0]
-                                      ['percentageCorrect']
-                                  .toDouble();
-                              return Card(
-                                child: ListTile(
-                                  title: const Text(
-                                    'Kết quả gần đây',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                  subtitle: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      CircularPercentIndicator(
-                                        animation: true,
-                                        radius: 40.0,
-                                        lineWidth: 10.0,
-                                        percent: percentageCorrect / 100,
-                                        center: Text(
-                                          '${percentageCorrect.toStringAsFixed(0)}%',
-                                          style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
+                        Visibility(
+                          visible: !_isLoading,
+                          child: FutureBuilder<List<DocumentSnapshot>>(
+                            future: _recordListFuture,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else if (!snapshot.hasData ||
+                                  snapshot.data!.isEmpty) {
+                                return Text('No records found');
+                              } else {
+                                // Lấy percentageCorrect từ danh sách bản ghi
+                                double percentageCorrect = snapshot.data![0]
+                                        ['percentageCorrect']
+                                    .toDouble();
+                                return Card(
+                                  child: ListTile(
+                                    title: const Text(
+                                      'Kết quả gần đây',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                    subtitle: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        CircularPercentIndicator(
+                                          animation: true,
+                                          radius: 40.0,
+                                          lineWidth: 10.0,
+                                          percent: percentageCorrect / 100,
+                                          center: Text(
+                                            '${percentageCorrect.toStringAsFixed(0)}%',
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          progressColor: Colors.green,
+                                          backgroundColor: Colors.orange,
                                         ),
-                                        progressColor: Colors.green,
-                                        backgroundColor: Colors.orange,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Số lần làm: ${snapshot.data![0]['times']}',
-                                            style:
-                                                TextStyle(color: Colors.black),
-                                          ),
-                                          Text(
-                                            'Số câu đúng: ${snapshot.data![0]['correctCount']}',
-                                            style:
-                                                TextStyle(color: Colors.green),
-                                          ),
-                                          Text(
-                                            'Số câu sai: ${snapshot.data![0]['wrongCount']}',
-                                            style:
-                                                TextStyle(color: Colors.orange),
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                      Visibility(
-                        visible: !_isLoading,
-                        child: Card(
-                          child: ListTile(
-                            onTap: () {
-                              if (_favoriteWordIds.isEmpty) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => FlashCardPage(
-                                      topic: _topic,
-                                      words: _words,
-                                      isEnglishFirst: _isEnglishFirst,
-                                      userId: widget.userId,
-                                      isRecord:
-                                          _isStudyAllSelected ? true : false,
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Số lần làm: ${snapshot.data![0]['times']}',
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                            Text(
+                                              'Số câu đúng: ${snapshot.data![0]['correctCount']}',
+                                              style: TextStyle(
+                                                  color: Colors.green),
+                                            ),
+                                            Text(
+                                              'Số câu sai: ${snapshot.data![0]['wrongCount']}',
+                                              style: TextStyle(
+                                                  color: Colors.orange),
+                                            ),
+                                          ],
+                                        )
+                                      ],
                                     ),
                                   ),
                                 );
-                              } else {
-                                if (_isStudyAllSelected == true) {
+                              }
+                            },
+                          ),
+                        ),
+                        Visibility(
+                          visible: !_isLoading,
+                          child: Card(
+                            child: ListTile(
+                              onTap: () {
+                                if (_favoriteWordIds.isEmpty) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -540,74 +526,55 @@ class _WordListPageState extends State<WordListPage> {
                                     ),
                                   );
                                 } else {
-                                  _addFavoriteWords();
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => FlashCardPage(
-                                        topic: _topic,
-                                        words: _favoriteWords,
-                                        isEnglishFirst: _isEnglishFirst,
-                                        userId: widget.userId,
-                                        isRecord:
-                                            _isStudyAllSelected ? true : false,
+                                  if (_isStudyAllSelected == true) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => FlashCardPage(
+                                          topic: _topic,
+                                          words: _words,
+                                          isEnglishFirst: _isEnglishFirst,
+                                          userId: widget.userId,
+                                          isRecord: _isStudyAllSelected
+                                              ? true
+                                              : false,
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  } else {
+                                    _addFavoriteWords();
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => FlashCardPage(
+                                          topic: _topic,
+                                          words: _favoriteWords,
+                                          isEnglishFirst: _isEnglishFirst,
+                                          userId: widget.userId,
+                                          isRecord: _isStudyAllSelected
+                                              ? true
+                                              : false,
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 }
-                              }
-                            },
-                            leading: const Icon(Icons.quiz),
-                            iconColor: const Color.fromRGBO(75, 0, 130, 1),
-                            title: const Text(
-                              'Thẻ ghi nhớ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              },
+                              leading: const Icon(Icons.quiz),
+                              iconColor: const Color.fromRGBO(75, 0, 130, 1),
+                              title: const Text(
+                                'Thẻ ghi nhớ',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Visibility(
-                        visible: !_isLoading,
-                        child: Card(
-                          child: ListTile(
-                            onTap: () {
-                              if (_favoriteWordIds.isEmpty) {
-                                if (_words.length < 4) {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: Text('Cảnh báo'),
-                                      content: Text(
-                                          'Bạn cần tối thiểu 4 từ để chơi.'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            print(_favoriteWords.length);
-                                            Navigator.pop(
-                                                context); // Đóng dialog
-                                          },
-                                          child: Text('OK'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => QuizzScreen(
-                                        words: _words,
-                                        isEnglishFirst: _isEnglishFirst,
-                                        userId: widget.userId,
-                                        topicId: widget.topicId,
-                                        isRecord:
-                                            _isStudyAllSelected ? true : false,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              } else {
-                                if (_isStudyAllSelected == true) {
+                        Visibility(
+                          visible: !_isLoading,
+                          child: Card(
+                            child: ListTile(
+                              onTap: () {
+                                if (_favoriteWordIds.isEmpty) {
                                   if (_words.length < 4) {
                                     showDialog(
                                       context: context,
@@ -644,75 +611,97 @@ class _WordListPageState extends State<WordListPage> {
                                     );
                                   }
                                 } else {
-                                  if (_favoriteWordIds.length < 4) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: Text('Cảnh báo'),
-                                        content: Text(
-                                            'Bạn cần tối thiểu 4 từ để chơi.'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              print(_favoriteWords.length);
-                                              Navigator.pop(
-                                                  context); // Đóng dialog
-                                            },
-                                            child: Text('OK'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  } else {
-                                    _addFavoriteWords();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => QuizzScreen(
-                                          words: _favoriteWords,
-                                          isEnglishFirst: _isEnglishFirst,
-                                          userId: widget.userId,
-                                          topicId: widget.topicId,
-                                          isRecord: _isStudyAllSelected
-                                              ? true
-                                              : false,
+                                  if (_isStudyAllSelected == true) {
+                                    if (_words.length < 4) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text('Cảnh báo'),
+                                          content: Text(
+                                              'Bạn cần tối thiểu 4 từ để chơi.'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                print(_favoriteWords.length);
+                                                Navigator.pop(
+                                                    context); // Đóng dialog
+                                              },
+                                              child: Text('OK'),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => QuizzScreen(
+                                            words: _words,
+                                            isEnglishFirst: _isEnglishFirst,
+                                            userId: widget.userId,
+                                            topicId: widget.topicId,
+                                            isRecord: _isStudyAllSelected
+                                                ? true
+                                                : false,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  } else {
+                                    if (_favoriteWordIds.length < 4) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text('Cảnh báo'),
+                                          content: Text(
+                                              'Bạn cần tối thiểu 4 từ để chơi.'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                print(_favoriteWords.length);
+                                                Navigator.pop(
+                                                    context); // Đóng dialog
+                                              },
+                                              child: Text('OK'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      _addFavoriteWords();
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => QuizzScreen(
+                                            words: _favoriteWords,
+                                            isEnglishFirst: _isEnglishFirst,
+                                            userId: widget.userId,
+                                            topicId: widget.topicId,
+                                            isRecord: _isStudyAllSelected
+                                                ? true
+                                                : false,
+                                          ),
+                                        ),
+                                      );
+                                    }
                                   }
                                 }
-                              }
-                            },
-                            leading: const Icon(Icons.checklist_rtl_rounded),
-                            iconColor: const Color.fromRGBO(75, 0, 130, 1),
-                            title: const Text(
-                              'Trắc nghiệm',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              },
+                              leading: const Icon(Icons.checklist_rtl_rounded),
+                              iconColor: const Color.fromRGBO(75, 0, 130, 1),
+                              title: const Text(
+                                'Trắc nghiệm',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Visibility(
-                        visible: !_isLoading,
-                        child: Card(
-                          child: ListTile(
-                            onTap: () {
-                              if (_favoriteWordIds.isEmpty) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => VocabularyGame(
-                                      words: _words,
-                                      isEnglishFirst: _isEnglishFirst,
-                                      userId: widget.userId,
-                                      topicId: widget.topicId,
-                                      isRecord:
-                                          _isStudyAllSelected ? true : false,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                if (_isStudyAllSelected == true) {
+                        Visibility(
+                          visible: !_isLoading,
+                          child: Card(
+                            child: ListTile(
+                              onTap: () {
+                                if (_favoriteWordIds.isEmpty) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -727,158 +716,177 @@ class _WordListPageState extends State<WordListPage> {
                                     ),
                                   );
                                 } else {
-                                  _addFavoriteWords();
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => VocabularyGame(
-                                        words: _favoriteWords,
-                                        isEnglishFirst: _isEnglishFirst,
-                                        userId: widget.userId,
-                                        topicId: widget.topicId,
-                                        isRecord:
-                                            _isStudyAllSelected ? true : false,
+                                  if (_isStudyAllSelected == true) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => VocabularyGame(
+                                          words: _words,
+                                          isEnglishFirst: _isEnglishFirst,
+                                          userId: widget.userId,
+                                          topicId: widget.topicId,
+                                          isRecord: _isStudyAllSelected
+                                              ? true
+                                              : false,
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  } else {
+                                    _addFavoriteWords();
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => VocabularyGame(
+                                          words: _favoriteWords,
+                                          isEnglishFirst: _isEnglishFirst,
+                                          userId: widget.userId,
+                                          topicId: widget.topicId,
+                                          isRecord: _isStudyAllSelected
+                                              ? true
+                                              : false,
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 }
-                              }
-                            },
-                            leading: const Icon(Icons.edit),
-                            iconColor: const Color.fromRGBO(75, 0, 130, 1),
-                            title: const Text(
-                              'Điền từ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              },
+                              leading: const Icon(Icons.edit),
+                              iconColor: const Color.fromRGBO(75, 0, 130, 1),
+                              title: const Text(
+                                'Điền từ',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Visibility(
-                        visible: !_isLoading,
-                        child: Card(
-                          child: ListTile(
-                            leading: Icon(Icons.format_list_numbered),
-                            iconColor: const Color.fromRGBO(75, 0, 130, 1),
-                            title: Text(
-                              'Bảng xếp hạng',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                        Visibility(
+                          visible: !_isLoading,
+                          child: Card(
+                            child: ListTile(
+                              leading: Icon(Icons.format_list_numbered),
+                              iconColor: const Color.fromRGBO(75, 0, 130, 1),
+                              title: Text(
+                                'Bảng xếp hạng',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => RecordListPage(
+                                      topicId: widget.topicId,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => RecordListPage(
-                                    topicId: widget.topicId,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        if (_favoriteWordIds.isNotEmpty)
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isStudyAllSelected = true;
+                                    _isStudyFavoriteSelected = false;
+                                  });
+                                  // Xử lý khi nhấn nút "học hết"
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _isStudyAllSelected
+                                      ? Colors.yellow
+                                      : Colors.grey,
+                                ),
+                                child: Text('Học hết'),
+                              ),
+                              SizedBox(width: 8), // Khoảng cách giữa hai nút
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isStudyAllSelected = false;
+                                    _isStudyFavoriteSelected = true;
+                                  });
+                                  // Xử lý khi nhấn nút "học từ yêu thích"
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _isStudyFavoriteSelected
+                                      ? Colors.yellow
+                                      : Colors.grey,
+                                ),
+                                child: Text('Học từ yêu thích'),
+                              ),
+                            ],
+                          ),
+                        const SizedBox(height: 8),
+                        Text('Danh sách từ vựng',
+                            style: TextStyle(fontSize: 24)),
+                        const SizedBox(height: 8),
+                        Visibility(
+                          visible: !_isLoading,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: _words.length,
+                            itemBuilder: (context, index) {
+                              final word = _words[index];
+                              final english = _words[index].english;
+                              final vietnam = _words[index].vietnam;
+                              final isFavorite =
+                                  _favoriteWordIds.contains(_words[index].id);
+                              print("Is favorite: $isFavorite");
+                              return Card(
+                                child: ListTile(
+                                  title: Text(english),
+                                  subtitle: Text(vietnam),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.edit),
+                                        onPressed: () {
+                                          _editWord(context, _words[index].id,
+                                              widget.topicId, english, vietnam);
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.delete),
+                                        onPressed: () {
+                                          _deleteWord(_words[index].id);
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.star,
+                                            color: isFavorite
+                                                ? Colors.yellow
+                                                : Colors.grey),
+                                        onPressed: () {
+                                          _toggleFavorite(word.id);
+                                        },
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          _speak('en-US', english);
+
+                                          Future.delayed(
+                                              const Duration(seconds: 2), () {
+                                            _speak('vi-VN', vietnam);
+                                          });
+                                        },
+                                        icon: Icon(Icons.speaker),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               );
                             },
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      if (_favoriteWordIds.isNotEmpty)
-                        Row(
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _isStudyAllSelected = true;
-                                  _isStudyFavoriteSelected = false;
-                                });
-                                // Xử lý khi nhấn nút "học hết"
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _isStudyAllSelected
-                                    ? Colors.yellow
-                                    : Colors.grey,
-                              ),
-                              child: Text('Học hết'),
-                            ),
-                            SizedBox(width: 8), // Khoảng cách giữa hai nút
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _isStudyAllSelected = false;
-                                  _isStudyFavoriteSelected = true;
-                                });
-                                // Xử lý khi nhấn nút "học từ yêu thích"
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _isStudyFavoriteSelected
-                                    ? Colors.yellow
-                                    : Colors.grey,
-                              ),
-                              child: Text('Học từ yêu thích'),
-                            ),
-                          ],
-                        ),
-                      const SizedBox(height: 8),
-                      Text('Danh sách từ vựng', style: TextStyle(fontSize: 24)),
-                      const SizedBox(height: 8),
-                      Visibility(
-                        visible: !_isLoading,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: _words.length,
-                          itemBuilder: (context, index) {
-                            final word = _words[index];
-                            final english = _words[index].english;
-                            final vietnam = _words[index].vietnam;
-                            final isFavorite =
-                                _favoriteWordIds.contains(_words[index].id);
-                            print("Is favorite: $isFavorite");
-                            return Card(
-                              child: ListTile(
-                                title: Text(english),
-                                subtitle: Text(vietnam),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.edit),
-                                      onPressed: () {
-                                        _editWord(context, _words[index].id,
-                                            widget.topicId, english, vietnam);
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete),
-                                      onPressed: () {
-                                        _deleteWord(_words[index].id);
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.star,
-                                          color: isFavorite
-                                              ? Colors.yellow
-                                              : Colors.grey),
-                                      onPressed: () {
-                                        _toggleFavorite(word.id);
-                                      },
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        _speak('en-US', english);
-
-                                        Future.delayed(
-                                            const Duration(seconds: 2), () {
-                                          _speak('vi-VN', vietnam);
-                                        });
-                                      },
-                                      icon: Icon(Icons.speaker),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ]),
+                      ]),
+                ),
               ),
-            ),
+      ),
     );
   }
 

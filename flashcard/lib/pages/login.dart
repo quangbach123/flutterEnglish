@@ -242,7 +242,7 @@ class _LogInState extends State<LogIn> with WidgetsBindingObserver {
                 height: 40.0,
               ),
               Text(
-                "or LogIn with",
+                "or Log In with",
                 style: TextStyle(
                     color: Color(0xFF273671),
                     fontSize: 22.0,
@@ -310,7 +310,7 @@ class _LogInState extends State<LogIn> with WidgetsBindingObserver {
                           MaterialPageRoute(builder: (context) => SignUp()));
                     },
                     child: Text(
-                      "SignUp",
+                      "Sign Up",
                       style: TextStyle(
                           color: Color(0xFF273671),
                           fontSize: 20.0,

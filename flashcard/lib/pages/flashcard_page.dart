@@ -46,7 +46,8 @@ class FlashCardPage extends StatefulWidget {
   State<FlashCardPage> createState() => _FlashCardPageState();
 }
 
-class _FlashCardPageState extends State<FlashCardPage> {
+class _FlashCardPageState extends State<FlashCardPage>
+    with SingleTickerProviderStateMixin {
   List<Word> _words = [];
   List<int> learn = []; // Danh sách các từ đã học
   List<int> not_learn = []; // Danh sách các từ chưa học
@@ -55,6 +56,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
   RecordService recordService = RecordService();
   late bool isRecord;
   Timer? _timer;
+
   int _finalElapsedSeconds = 0; // biến lưu thời gian
   late int _elapsedSeconds; // biến đếm thời gian
   bool _timerStopped = false;
@@ -62,13 +64,14 @@ class _FlashCardPageState extends State<FlashCardPage> {
   MatchEngine? _matchEngine;
   List<SwipeItem> _swipeItems = <SwipeItem>[];
   Color color = Colors.black;
+  late FlipCardController _flipCardController; // Add FlipCardController
 
   bool isAutoMode = false;
 
-  var duration = Duration(days: 500);
-
   @override
   void initState() {
+    _flipCardController = FlipCardController();
+
     _words = widget.words;
     isRecord = widget.isRecord;
     print(_currentIndex);
@@ -112,7 +115,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
 
   @override
   void dispose() {
+    _matchEngine?.dispose();
     _timer?.cancel();
+
     super.dispose();
   }
 
@@ -207,15 +212,20 @@ class _FlashCardPageState extends State<FlashCardPage> {
   }
 
   void setAutoMode() {
-    setState(() {
-      isAutoMode = !isAutoMode;
-      duration = Duration(seconds: 3);
-    });
+    if (!mounted)
+      return; // Add this line to check if the widget is still active
+    else {
+      setState(() {
+        isAutoMode = !isAutoMode;
+      });
+    }
 
     print(isAutoMode);
     if (isAutoMode) {
       _timer = Timer.periodic(Duration(seconds: 6), (timer) {
-        if (_currentIndex < _words.length) {
+        if (_currentIndex < _words.length && mounted) {
+          _flipCardController.toggleCard(); // Flip the card before swiping
+
           _matchEngine!.currentItem!.like();
         } else {
           _timer?.cancel();
@@ -302,6 +312,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                 //   _swipeItems[index].content.english,
                 // );
                 return FlipCard(
+                  controller: _flipCardController,
                   direction: FlipDirection.HORIZONTAL, // default
 
                   front: _buildFrontWidget(
@@ -311,10 +322,10 @@ class _FlashCardPageState extends State<FlashCardPage> {
                     _words[index].vietnam,
                   ),
                   side: CardSide.FRONT, // The side to initially display.
-                  autoFlipDuration: duration,
                 );
               },
               onStackFinished: () {
+                _timerStopped = true;
                 if (isRecord == true) {
                   recordService.saveRecord(
                       userId: widget.userId,
@@ -363,6 +374,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
               IconButton(onPressed: () {}, icon: Icon(Icons.replay)),
               IconButton(
                   onPressed: () {
+                    _timer?.cancel();
                     setState(() {
                       setAutoMode();
                     });

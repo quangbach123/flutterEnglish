@@ -17,6 +17,7 @@ class UserTopicScreen extends StatefulWidget {
 class _UserTopicScreenState extends State<UserTopicScreen> {
   final TopicService _topicService = TopicService();
   late List<Topic> _topics;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _UserTopicScreenState extends State<UserTopicScreen> {
       List<Topic> topics = await _topicService.getTopicsByUserId(widget.userId);
       setState(() {
         _topics = topics;
+        _isLoading = false;
       });
     } catch (error) {
       print("Error loading topics: $error");
@@ -129,68 +131,73 @@ class _UserTopicScreenState extends State<UserTopicScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _topics.isEmpty
-          ? const Center(child: Text('No topics found'))
-          : ListView.builder(
-              itemCount: _topics.length,
-              itemBuilder: (context, index) {
-                Topic topic = _topics[index];
-                return Card.outlined(
-                  child: ListTile(
-                    title: ListTile(
-                      title: Text(
-                        topic.topicName,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    subtitle: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(topic.userAvatarUrl ??
-                            'https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png'),
-                      ),
-                      title: Text(topic.userName ?? 'Unknown'),
-                      trailing: Text(topic.view),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon:
-                              Icon(topic.isPublic ? Icons.public : Icons.lock),
-                          onPressed: () => _toggleTopicStatus(
-                              topic.documentId, topic.isPublic),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  _buildEditTopicDialog(topic),
+      body: Center(
+        child: _isLoading
+            ? const CircularProgressIndicator()
+            : _topics.isEmpty
+                ? const Text("No topic found")
+                : ListView.builder(
+                    itemCount: _topics.length,
+                    itemBuilder: (context, index) {
+                      Topic topic = _topics[index];
+                      return Card.outlined(
+                        child: ListTile(
+                          title: ListTile(
+                            title: Text(
+                              topic.topicName,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          subtitle: ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: NetworkImage(topic
+                                      .userAvatarUrl ??
+                                  'https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png'),
+                            ),
+                            title: Text(topic.userName ?? 'Unknown'),
+                            trailing: Text(topic.view),
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                    topic.isPublic ? Icons.public : Icons.lock),
+                                onPressed: () => _toggleTopicStatus(
+                                    topic.documentId, topic.isPublic),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) =>
+                                        _buildEditTopicDialog(topic),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () => _deleteTopic(topic.documentId),
+                              ),
+                            ],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WordListPage(
+                                  topicId: topic.documentId,
+                                  userId: widget.userId,
+                                ),
+                              ),
                             );
                           },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () => _deleteTopic(topic.documentId),
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => WordListPage(
-                            topicId: topic.documentId,
-                            userId: widget.userId,
-                          ),
                         ),
                       );
                     },
                   ),
-                );
-              },
-            ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTopic,
         child: Icon(Icons.add),

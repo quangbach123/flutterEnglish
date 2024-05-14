@@ -125,22 +125,33 @@ class _UserFoldersScreenState extends State<UserFoldersScreen> {
   }
 
   Future<void> _loadData() async {
-    // Load user data
-    User? user = await _userService.getUserById(widget.userId);
-    if (user != null) {
-      setState(() {
-        _user = user;
-      });
+    try {
+      // Load user data
+      User? user = await _userService.getUserById(widget.userId);
+      if (user != null) {
+        if (!mounted) return;
+        setState(() {
+          _user = user;
+        });
 
-      // Load folders data
-      List<Folder> folders =
-          await _userService.getAllFoldersByUserId(widget.userId);
-      setState(() {
-        _folders = folders;
-        _isLoading = false; // Dữ liệu đã được tải xong
-      });
-    } else {
-      // Handle user not found
+        // Load folders data
+        List<Folder> folders =
+            await _userService.getAllFoldersByUserId(widget.userId);
+        if (!mounted) return;
+        setState(() {
+          _folders = folders;
+          _isLoading = false; // Dữ liệu đã được tải xong
+        });
+      } else {
+        // Handle user not found
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      print("Error loading data: $error");
     }
   }
 

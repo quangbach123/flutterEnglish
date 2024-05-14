@@ -33,7 +33,7 @@ class _SignUpState extends State<SignUp> {
 
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
-        
+
         await FirebaseFirestore.instance
             .collection('User')
             .doc(userCredential.user!.uid)
@@ -99,15 +99,16 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(
+      body: SafeArea(
         child: Column(
           children: [
-            Container(
-                width: MediaQuery.of(context).size.width,
-                child: Image.asset(
-                  "images/car.PNG",
-                  fit: BoxFit.cover,
-                )),
+            Text(
+              "Sign Up",
+              style: TextStyle(
+                  color: Color(0xFF273671),
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.w500),
+            ),
             SizedBox(
               height: 30.0,
             ),
@@ -225,7 +226,7 @@ class _SignUpState extends State<SignUp> {
               height: 40.0,
             ),
             Text(
-              "or LogIn with",
+              "or Log In with",
               style: TextStyle(
                   color: Color(0xFF273671),
                   fontSize: 22.0,
@@ -237,20 +238,39 @@ class _SignUpState extends State<SignUp> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  "images/google.png",
-                  height: 45,
-                  width: 45,
-                  fit: BoxFit.cover,
+                GestureDetector(
+                  onTap: () {},
+                  child: const Icon(
+                    Icons.facebook,
+                    size: 50,
+                    color: Color(0xFF273671),
+                  ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 30.0,
                 ),
-                Image.asset(
-                  "images/apple1.png",
-                  height: 50,
-                  width: 50,
-                  fit: BoxFit.cover,
+                GestureDetector(
+                  onTap: () {
+                    // AuthMethods().signInWithApple();
+                  },
+                  child: const Icon(
+                    Icons.g_mobiledata,
+                    size: 50,
+                    color: Color(0xFF273671),
+                  ),
+                ),
+                const SizedBox(
+                  width: 30.0,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    // AuthMethods().signInWithApple();
+                  },
+                  child: const Icon(
+                    Icons.apple,
+                    size: 50,
+                    color: Color(0xFF273671),
+                  ),
                 )
               ],
             ),
@@ -274,7 +294,7 @@ class _SignUpState extends State<SignUp> {
                         MaterialPageRoute(builder: (context) => LogIn()));
                   },
                   child: Text(
-                    "LogIn",
+                    "Log In",
                     style: TextStyle(
                         color: Color(0xFF273671),
                         fontSize: 20.0,

@@ -12,6 +12,7 @@ class AchievementPage extends StatefulWidget {
 
 class _AchievementPageState extends State<AchievementPage> {
   List<DocumentSnapshot> _userAchievements = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -26,6 +27,7 @@ class _AchievementPageState extends State<AchievementPage> {
           .getRecordsByUserIdAndPercentageCorrect(widget.userId);
       setState(() {
         _userAchievements = records;
+        _isLoading = false;
       });
     } catch (error) {
       print("Error getting user achievements: $error");
@@ -73,7 +75,9 @@ class _AchievementPageState extends State<AchievementPage> {
       );
     } else {
       // Nếu không có bản ghi nào được tìm thấy
-      return SizedBox.shrink();
+      return Center(
+        child: Text('No achievements found'),
+      );
     }
   }
 
@@ -84,9 +88,13 @@ class _AchievementPageState extends State<AchievementPage> {
         title: Text('Achievement Page'),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: _getUserAchievementsWidget(),
-        ),
+        child: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : SingleChildScrollView(
+                child: _getUserAchievementsWidget(),
+              ),
       ),
     );
   }
