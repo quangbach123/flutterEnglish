@@ -870,7 +870,7 @@ class _WordListPageState extends State<WordListPage> {
                                           _speak('en-US', english);
 
                                           Future.delayed(
-                                              const Duration(seconds: 2), () {
+                                              const Duration(seconds: 1), () {
                                             _speak('vi-VN', vietnam);
                                           });
                                         },
@@ -889,7 +889,7 @@ class _WordListPageState extends State<WordListPage> {
       ),
     );
   }
-
+  
   void _editWord(BuildContext context, String wordId, String topicId,
       String english, String vietnamese) {
     TextEditingController englishController =

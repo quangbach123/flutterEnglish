@@ -42,8 +42,9 @@ class _WrongWordPageState extends State<WrongWordPage> {
     _words = widget.arguments.words;
     wrong = widget.arguments.wrong;
     learned = widget.arguments.learned;
-    print(_words);
-    print(wrong);
+    // print(_words.length);
+    // print(learned);
+    // print(wrong);
   }
 
   double calculatePercentage(

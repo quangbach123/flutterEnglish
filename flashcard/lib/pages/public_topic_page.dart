@@ -81,7 +81,7 @@ class _PublicTopicsPageState extends State {
                 final String? userAvatarUrl = topic.userAvatarUrl;
                 final String? userName =
                     topic.userName; // Lấy userName từ topic
-                return Card.outlined(
+                return Card(
                     child: ListTile(
                   title: ListTile(
                     title: Text(

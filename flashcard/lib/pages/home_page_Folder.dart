@@ -212,7 +212,7 @@ class _UserFoldersScreenState extends State<UserFoldersScreen> {
               : ListView.builder(
                   itemCount: _folders.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return Card.outlined(
+                    return Card(
                       child: ListTile(
                         leading: Icon(Icons.folder),
                         title: Text(_folders[index].name),

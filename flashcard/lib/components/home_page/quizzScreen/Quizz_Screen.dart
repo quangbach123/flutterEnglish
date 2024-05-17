@@ -64,7 +64,6 @@ class _QuizzScreenState extends State<QuizzScreen> {
   }
 
   void _checkAnswer(String selectedAnswer) {
-    // count++;
     Word? selectedWord;
     if (isEnglishFirst) {
       selectedWord = words.firstWhere((word) => word.vietnam == selectedAnswer,
@@ -78,14 +77,18 @@ class _QuizzScreenState extends State<QuizzScreen> {
       if (isEnglishFirst) {
         if (selectedWord.vietnam == _correctAnswer) {
           correctAnswers.add(selectedWord);
+          print('add to correct');
         } else {
           wrongAnswers.add(selectedWord);
+          print('add to wrong');
         }
       } else {
         if (selectedWord.english == _correctAnswer) {
           correctAnswers.add(selectedWord);
+          print('add to correct');
         } else {
           wrongAnswers.add(selectedWord);
+          print('add to wrong');
         }
       }
     }
@@ -103,24 +106,6 @@ class _QuizzScreenState extends State<QuizzScreen> {
     _fetchQuestion();
   }
 
-  // Future<void> _initRemainingWords() async {
-  //   WordService wordService = WordService();
-  //   try {
-  //     QuerySnapshot snapshot = await wordService.getWordsStream().first;
-  //     _remainingWords.clear();
-
-  //     for (QueryDocumentSnapshot doc in snapshot.docs) {
-  //       String english = doc['english'];
-  //       String vietnam = doc['vietnam'];
-
-  //       Map<String, String> word = {'english': english, 'vietnam': vietnam};
-  //       _remainingWords.add(word);
-  //     }
-  //     print(_remainingWords);
-  //   } catch (error) {
-  //     print('Error initializing remaining words: $error');
-  //   }
-  // }
   Future<void> _initRemainingWords(List<Word> words) async {
     try {
       _remainingWords.clear();
@@ -139,80 +124,94 @@ class _QuizzScreenState extends State<QuizzScreen> {
     }
   }
 
-  void _fetchQuestion() {
-    count++;
-    var random = Random();
+void _fetchQuestion() {
+  count++;
+  var random = Random();
 
-    var remainingQuestions = _remainingWords.where((word) {
-      if (isEnglishFirst) {
-        return !_selectedQuestions.contains(word['english']);
-      } else {
-        return !_selectedQuestions.contains(word['vietnam']);
-      }
-    }).toList();
+  // Kiểm tra xem danh sách `_remainingWords` có rỗng không
+  if (_remainingWords.isEmpty) {
+    // Xử lý khi danh sách rỗng
+    return;
+  }
 
-    if (remainingQuestions.isEmpty) {
-      showResultDialog(
-          context,
-          correctAnswers.length,
-          wrongAnswers.length,
-          _formatElapsedTime(_elapsedSeconds),
-          words,
-          wrongAnswers,
-          correctAnswers,
-          widget.userId,
-          widget.topicId,
-          isRecord);
-    }
-
-    var randomQuestion =
-        remainingQuestions[random.nextInt(remainingQuestions.length)];
-
-    setState(() {
-      if (isEnglishFirst) {
-        _question = randomQuestion['english'];
-        _correctAnswer = randomQuestion['vietnam']!;
-      } else {
-        _question = randomQuestion['vietnam'];
-        _correctAnswer = randomQuestion['english']!;
-      }
-    });
-
-    var allAnswers = _remainingWords.where((word) {
-      if (isEnglishFirst) {
-        return word['vietnam'] != _correctAnswer;
-      } else {
-        return word['english'] != _correctAnswer;
-      }
-    }).map((word) {
-      if (isEnglishFirst) {
-        return word['vietnam'];
-      } else {
-        return word['english'];
-      }
-    }).toList();
-
-    var answers = [_correctAnswer];
-
-    while (answers.length < 4 && allAnswers.isNotEmpty) {
-      var randomAnswer = allAnswers[random.nextInt(allAnswers.length)];
-      if (!answers.contains(randomAnswer)) {
-        answers.add(randomAnswer!);
-      }
-    }
-
-    answers.shuffle();
-
-    setState(() {
-      _answers = answers;
-    });
-
+  var remainingQuestions = _remainingWords.where((word) {
     if (isEnglishFirst) {
-      _selectedQuestions.add(randomQuestion['english']!);
+      return !_selectedQuestions.contains(word['english']);
     } else {
-      _selectedQuestions.add(randomQuestion['vietnam']!);
+      return !_selectedQuestions.contains(word['vietnam']);
+    }
+  }).toList();
+
+  // Kiểm tra xem danh sách `remainingQuestions` có rỗng không
+  if (remainingQuestions.isEmpty) {
+    showResultDialog(
+      context,
+      correctAnswers.length,
+      wrongAnswers.length,
+      _formatElapsedTime(_elapsedSeconds),
+      words,
+      wrongAnswers,
+      correctAnswers,
+      widget.userId,
+      widget.topicId,
+      isRecord,
+    );
+    return;
+  }
+
+  var randomQuestion = remainingQuestions[random.nextInt(remainingQuestions.length)];
+
+  setState(() {
+    if (isEnglishFirst) {
+      _question = randomQuestion['english'];
+      _correctAnswer = randomQuestion['vietnam']!;
+    } else {
+      _question = randomQuestion['vietnam'];
+      _correctAnswer = randomQuestion['english']!;
+    }
+  });
+
+  var allAnswers = _remainingWords.where((word) {
+    if (isEnglishFirst) {
+      return word['vietnam'] != _correctAnswer;
+    } else {
+      return word['english'] != _correctAnswer;
+    }
+  }).map((word) {
+    if (isEnglishFirst) {
+      return word['vietnam'];
+    } else {
+      return word['english'];
+    }
+  }).toList();
+
+  // Kiểm tra xem danh sách `allAnswers` có rỗng không
+  if (allAnswers.isEmpty) {
+    // Xử lý khi danh sách trống
+    return;
+  }
+
+  var answers = [_correctAnswer];
+
+  while (answers.length < 4 && allAnswers.isNotEmpty) {
+    var randomAnswer = allAnswers[random.nextInt(allAnswers.length)];
+    if (!answers.contains(randomAnswer)) {
+      answers.add(randomAnswer!);
     }
   }
+
+  answers.shuffle();
+  setState(() {
+    _answers = answers;
+  });
+
+  if (isEnglishFirst) {
+    _selectedQuestions.add(randomQuestion['english']!);
+  } else {
+    _selectedQuestions.add(randomQuestion['vietnam']!);
+  }
+}
+
 
   void startTimer() {
     _elapsedSeconds = 0;
@@ -251,7 +250,7 @@ class _QuizzScreenState extends State<QuizzScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          'Câu hỏi số ${count + 0}',
+          'Câu hỏi số ${count}',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -301,15 +300,32 @@ class _QuizzScreenState extends State<QuizzScreen> {
 // hàm tìm ra index của các phần tử sai trong mảng words
 List<int> findIndexesOfWrongAnswers(List<Word> words, List<Word> wrongAnswers) {
   List<int> indexes = [];
-
   for (int i = 0; i < words.length; i++) {
-    if (wrongAnswers.contains(words[i])) {
+    bool isWrongAnswer = false;
+    for (Word wrong in wrongAnswers) {
+      if (words[i].id == wrong.id) {
+        isWrongAnswer = true;
+        break;
+      }
+    }
+    if (isWrongAnswer) {
       indexes.add(i);
     }
   }
-
   return indexes;
 }
+List<int> findIndexesInWords(List<Word> words, List<Word> answers) {
+  List<int> indexes = [];
+  for (Word answer in answers) {
+    int index = words.indexWhere((word) => word.id == answer.id);
+    if (index != -1) {
+      indexes.add(index);
+    }
+  }
+  return indexes;
+}
+
+
 
 // tính phầm trăm câu đúng
 double calculatePercentage(int correctCount, int totalCount) {
@@ -319,106 +335,14 @@ double calculatePercentage(int correctCount, int totalCount) {
   return (correctCount / totalCount) * 100.0;
 }
 
-// hàm show dialog
-// void showResultDialog(BuildContext context, int correctCount, int wrongCount, String elapsedTime,List<Word> words, List<Word> wrong, String userId, String topicId,isRecord) {
-//   RecordService recordSerivce = RecordService();
-//   if(isRecord==true){
-//                 recordSerivce.saveRecord(
-//                 userId: userId,
-//                 topicId: topicId,
-//                 percentageCorrect: calculatePercentage(correctCount, words.length),
-//                 correctCount: correctCount,
-//                 wrongCount: wrongCount,
-//                 elapsedTime: elapsedTime,
-//                 typeTest:"Multiple"
-//                 );
-
-//   }
-//   showDialog(
-//     context: context,
-//     builder: (BuildContext context) {
-//       return AlertDialog(
-//         backgroundColor: oColor,
-//         title: const Text(
-//           'KẾT QUẢ HỌC TẬP',
-//           style: TextStyle(color: Colors.white),
-//         ),
-//         content: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Row(
-//               children: [
-//                 Text(
-//                   'Phần trăm câu đúng: ',
-//                   style: TextStyle(color: Colors.white),
-//                 ),
-//                 Text(
-//                   '${calculatePercentage(correctCount, words.length).toStringAsFixed(2)}%',
-//                   style: TextStyle(color: Colors.white),
-//                 ),
-//               ],
-//             ),
-//             SizedBox(height: 16), // Khoảng cách giữa các dòng
-//             Text(
-//               'Đã học: ${correctCount.toString()}',
-//               style: TextStyle(color: Colors.white),
-//             ),
-//             const SizedBox(height: 16), // Khoảng cách giữa các dòng
-//             Text(
-//               'Chưa học: ${wrongCount.toString()}',
-//               style: TextStyle(color: Colors.white),
-//             ),
-//             const SizedBox(height: 16), // Khoảng cách giữa các dòng
-//             Text(
-//               'Thời gian hoàn thành: $elapsedTime',
-//               style: TextStyle(color: Colors.white),
-//             ),
-//           ],
-//         ),
-//         actions: [
-//           TextButton(
-//             onPressed: () {
-//                Navigator.pop(context);
-//             },
-//             child: Text(
-//               'Đóng',
-//               style: TextStyle(color: Colors.white),
-//             ),
-//           ),
-//           TextButton(
-//             onPressed: () {
-//               Navigator.pushReplacement(
-//                 context,
-//                 MaterialPageRoute(
-//                   builder: (context) => WrongWordPage(
-//                     arguments: NavigationArguments(
-//                       words: words,
-//                       wrong: findIndexesOfWrongAnswers(words,wrong),
-//                     ),
-//                   ),
-//                 ),
-//               );
-//             },
-//             child: Text(
-//               'Nút tùy chọn',
-//               style: TextStyle(color: Colors.white),
-//             ),
-//           ),
-//         ],
-//       );
-//     },
-//   );
-//   }
-
 void showResultDialog(
     BuildContext context,
     int correctCount,
     int wrongCount,
     String elapsedTime,
     List<Word> words,
-    List<Word> wrong,
-    List<Word> correct,
+    List<Word> wrongAnswers,
+    List<Word> correctAnswers,
     String userId,
     String topicId,
     isRecord) {
@@ -433,6 +357,14 @@ void showResultDialog(
         elapsedTime: elapsedTime,
         typeTest: "Multiple");
   }
+  List<int> wrongIndexes = findIndexesInWords(words, wrongAnswers);
+  List<int> learnedIndexes = findIndexesInWords(words, correctAnswers);
+  print('Số đáp án đúng: ${correctAnswers.length}');
+  print('Số đáp án sai: ${wrongAnswers.length}');
+
+  // Print the indexes
+  print('Indexes of wrong answers: $wrongIndexes');
+  print('Indexes of learned answers: $learnedIndexes');
 
   Navigator.pushReplacement(
     context,
@@ -440,8 +372,8 @@ void showResultDialog(
       builder: (context) => WrongWordPage(
         arguments: NavigationArguments(
           words: words,
-          wrong: findIndexesOfWrongAnswers(words, wrong),
-          learned: findIndexesOfWrongAnswers(words, correct),
+          wrong: wrongIndexes,
+          learned: learnedIndexes
         ),
       ),
     ),

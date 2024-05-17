@@ -140,7 +140,7 @@ class _UserTopicScreenState extends State<UserTopicScreen> {
                     itemCount: _topics.length,
                     itemBuilder: (context, index) {
                       Topic topic = _topics[index];
-                      return Card.outlined(
+                      return Card(
                         child: ListTile(
                           title: ListTile(
                             title: Text(
