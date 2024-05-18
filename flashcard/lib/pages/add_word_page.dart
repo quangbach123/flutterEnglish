@@ -25,6 +25,8 @@ class _AddWordPageState extends State<AddWordPage> {
   List<String> _englishWords = [];
   List<String> _vietnameseWords = [];
 
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,54 +48,58 @@ class _AddWordPageState extends State<AddWordPage> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _englishWords.length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      child: ListTile(
-                        title: TextFormField(
-                          decoration: InputDecoration(labelText: 'Tiếng Anh'),
-                          initialValue: _englishWords[index],
-                          onChanged: (value) {
-                            setState(() {
-                              _englishWords[index] = value;
-                            });
-                          },
-                        ),
-                        subtitle: TextFormField(
-                          decoration: InputDecoration(labelText: 'Tiếng Việt'),
-                          initialValue: _vietnameseWords[index],
-                          onChanged: (value) {
-                            setState(() {
-                              _vietnameseWords[index] = value;
-                            });
-                          },
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () {
-                            setState(() {
-                              _englishWords.removeAt(index);
-                              _vietnameseWords.removeAt(index);
-                            });
-                          },
-                        ),
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _englishWords.length,
+                        itemBuilder: (context, index) {
+                          return Card(
+                            child: ListTile(
+                              title: TextFormField(
+                                decoration:
+                                    InputDecoration(labelText: 'Tiếng Anh'),
+                                initialValue: _englishWords[index],
+                                onChanged: (value) {
+                                  setState(() {
+                                    _englishWords[index] = value;
+                                  });
+                                },
+                              ),
+                              subtitle: TextFormField(
+                                decoration:
+                                    InputDecoration(labelText: 'Tiếng Việt'),
+                                initialValue: _vietnameseWords[index],
+                                onChanged: (value) {
+                                  setState(() {
+                                    _vietnameseWords[index] = value;
+                                  });
+                                },
+                              ),
+                              trailing: IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () {
+                                  setState(() {
+                                    _englishWords.removeAt(index);
+                                    _vietnameseWords.removeAt(index);
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-        ),
+              ),
         floatingActionButton: FloatingActionButton(
           onPressed: _addWordToList,
           child: Icon(Icons.add),
@@ -167,18 +173,27 @@ class _AddWordPageState extends State<AddWordPage> {
   }
 
   Future<void> _addWordsToTopic() async {
+    setState(() {
+      isLoading = true;
+    });
     if (_englishWords.isNotEmpty && _vietnameseWords.isNotEmpty) {
       try {
         for (int i = 0; i < _englishWords.length; i++) {
           await _wordService.addWord(
               _englishWords[i], _vietnameseWords[i], widget.topicId);
         }
+        setState(() {
+          isLoading = false;
+        });
         Navigator.pop(context); // Trở về màn hình trước sau khi thêm từ
       } catch (error) {
         print('Error adding words: $error');
       }
     } else {
       // Hiển thị thông báo lỗi nếu không có từ nào để thêm
+      setState(() {
+        isLoading = false;
+      });
       showDialog(
         context: context,
         builder: (BuildContext context) {

@@ -192,20 +192,6 @@ class _UserFoldersScreenState extends State<UserFoldersScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            'Name: ${_user.name}',
-            style: TextStyle(fontSize: 18),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            'Email: ${_user.email}',
-            style: TextStyle(fontSize: 18),
-          ),
-        ),
         Expanded(
           child: _folders.isEmpty
               ? Center(child: Text('No folders found'))
